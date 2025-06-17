@@ -84,7 +84,7 @@ class EmbedHelper {
     }
 
     embed.setFooter({
-      text: '📚 Dicky : Dictionary key ✨',
+      text: '📚 Dicky : Dictionary Key ✨',
     });
 
     return embed;
@@ -113,7 +113,7 @@ class EmbedHelper {
     }
 
     embed.setFooter({
-      text: '📚 Dicky : Dictionary key ✨',
+      text: '📚 Dicky : Dictionary Key ✨',
     });
 
     return embed;
@@ -142,7 +142,7 @@ class EmbedHelper {
     }
 
     embed.setFooter({
-      text: '📚 Dicky : Dictionary key ✨',
+      text: '📚 Dicky : Dictionary Key ✨',
     });
 
     return embed;
@@ -155,14 +155,14 @@ class EmbedHelper {
       .setDescription(`🔍 ${error}`)
       .setTimestamp()
       .setFooter({
-        text: '📚 Dicky : Dictionary key ✨',
+        text: '📚 Dicky : Dictionary Key ✨',
       });
   }
 
   static createHelpEmbed() {
     return new EmbedBuilder()
       .setColor(0x5865F2) // Discord brand color
-      .setTitle('📚 Dicky : Dictionary key ✨ - Command Guide')
+      .setTitle('📚 Dicky : Dictionary Key ✨ - Command Guide')
       .setDescription('🌟 **Welcome!** Here are all the slash commands you can use:')
       .addFields(
         {
@@ -195,7 +195,7 @@ class EmbedHelper {
       )
       .setTimestamp()
       .setFooter({
-        text: '📚 Dicky : Dictionary key ✨ • Made with ❤️',
+        text: '📚 Dicky : Dictionary Key ✨ • Made with ❤️',
       });
   }
 }

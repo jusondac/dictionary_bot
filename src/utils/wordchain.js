@@ -1,4 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
+const dictionaryAPI = require('./dictionary.js');
 
 // Letter point values based on rarity
 const LETTER_POINTS = {
@@ -95,9 +96,9 @@ class WordChainGame {
     }, 5 * 60 * 1000);
 
     return true;
-  }
-
-  isValidWord(word, userId) {
+  } 
+  
+  async isValidWord(word, userId) {
     const normalizedWord = word.toLowerCase().trim();
 
     // Check if word starts with the last letter of current word
@@ -123,10 +124,17 @@ class WordChainGame {
       return { valid: false, reason: 'Word must be at least 2 characters long!' };
     }
 
+    // Check if the word exists in the English dictionary
+    try {
+      await dictionaryAPI.getDefinition(normalizedWord);
+    } catch (error) {
+      return { valid: false, reason: 'This is not a valid English word!' };
+    }
+
     return { valid: true };
   }
 
-  submitWord(word, userId) {
+  async submitWord(word, userId) {
     // console.log(`🔍 submitWord called - word: "${word}", userId: ${userId}`);
 
     const currentPlayer = this.getCurrentPlayer();
@@ -137,7 +145,7 @@ class WordChainGame {
       return { success: false, reason: 'Not your turn!' };
     }
 
-    const validation = this.isValidWord(word, userId);
+    const validation = await this.isValidWord(word, userId);
     // console.log(`✅ Word validation:`, validation);
 
     if (!validation.valid) {
