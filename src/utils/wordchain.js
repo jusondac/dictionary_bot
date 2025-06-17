@@ -200,7 +200,7 @@ class WordChainGame {
 
     if (this.gameState === 'waiting') {
       embed.setTitle('🔤 Word Chain Game - Waiting for Players')
-        .setDescription('Use `/join-game` to join the game!\n\n**How to play:**\n• Make a word that starts with the last letter of the previous word\n• You have 20 seconds per turn\n• Each letter has points based on rarity (Z=10, Q=10, A=1, etc.)\n• Game lasts 2 minutes')
+        .setDescription('Use `/join-game` to join the game!\n\n**How to play:**\n• Make a word that starts with the last letter of the previous word\n• To answer by use /word <your answer>\n• You have 40 seconds per turn\n• Each letter has points based on rarity (Z=10, Q=10, A=1, etc.)\n• Game lasts 5 minutes')
         .addFields({
           name: '👥 Players',
           value: this.players.size > 0 ?
@@ -216,13 +216,8 @@ class WordChainGame {
       const turnTimeRemaining = Math.max(0, 20 - turnTimeElapsed);
 
       embed.setTitle('🔤 Word Chain Game - In Progress')
-        .setDescription(`**Current Word:** \`${this.currentWord.toUpperCase()}\`\n**Next word must start with: \`${this.currentWord.slice(-1).toUpperCase()}\`**`)
+        .setDescription(`**# Current Word: \`${this.currentWord.toUpperCase()}\`**\n**Next word must start with: \`${this.currentWord.slice(-1).toUpperCase()}\`**`)
         .addFields(
-          {
-            name: '⏰ Time Remaining',
-            value: `Game: ${Math.floor(timeRemaining / 60)}:${(timeRemaining % 60).toString().padStart(2, '0')}\nTurn: ${turnTimeRemaining}s`,
-            inline: true
-          },
           {
             name: '🎯 Current Turn',
             value: currentPlayer ? `${currentPlayer.username}` : 'Unknown',

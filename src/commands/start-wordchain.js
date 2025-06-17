@@ -41,7 +41,7 @@ module.exports = {
     // Send initial game embed
     const embed = game.getGameEmbed();
     await message.reply({
-      content: '🎮 **Word Chain Game Starting!**\n\n⏰ Players have **20 seconds** to join using `/join-game`\n🎯 Game will start automatically when enough players join!',
+      content: '🎮 **Word Chain Game Starting!**\n\n⏰ Players have **30 seconds** to join using `/join-game`\n🎯 Game will start automatically when enough players join!',
       embeds: [embed]
     });
 
@@ -95,7 +95,7 @@ module.exports = {
           }
         }
       }
-    }, 20000);
+    }, 30000);
   }
 };
 
