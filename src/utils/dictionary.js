@@ -1,16 +1,14 @@
 const axios = require('axios');
-const config = require('../config/config');
 
 class DictionaryAPI {
   constructor() {
     this.baseURL = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
-    this.wordsApiURL = 'https://wordsapiv1.p.rapidapi.com/words/';
   }
 
   // Get word definition using free Dictionary API
   async getDefinition(word) {
     try {
-      const response = await axios.get(`${this.baseURL}${word}`);
+      const response = await axios.get(`${this.baseURL}${word.toLowerCase()}`);
       const data = response.data[0];
 
       if (!data) {
@@ -19,14 +17,22 @@ class DictionaryAPI {
 
       const definitions = [];
       data.meanings.forEach(meaning => {
-        meaning.definitions.forEach(def => {
-          definitions.push({
-            partOfSpeech: meaning.partOfSpeech,
-            definition: def.definition,
-            example: def.example || null
+        if (meaning.definitions && Array.isArray(meaning.definitions)) {
+          meaning.definitions.forEach(def => {
+            if (def.definition) { // Only add if definition exists
+              definitions.push({
+                partOfSpeech: meaning.partOfSpeech,
+                definition: def.definition,
+                example: def.example || null
+              });
+            }
           });
-        });
+        }
       });
+
+      if (definitions.length === 0) {
+        throw new Error(`No valid definitions found for "${word}"`);
+      }
 
       return {
         word: data.word,
@@ -35,41 +41,17 @@ class DictionaryAPI {
         sourceUrls: data.sourceUrls || []
       };
     } catch (error) {
+      if (error.response && error.response.status === 404) {
+        throw new Error(`The word "${word}" was not found. Please check the spelling and try again.`);
+      }
       throw new Error(`Could not find definition for "${word}"`);
     }
   }
 
-  // Get synonyms using WordsAPI (requires API key)
+  // Get synonyms from free API
   async getSynonyms(word) {
     try {
-      if (!config.wordsApiKey) {
-        console.log('WordsAPI key not configured, using fallback method');
-        // Use fallback immediately if no API key
-        return this.getSynonymsFallback(word);
-      }
-
-      const response = await axios.get(`${this.wordsApiURL}${word}/synonyms`, {
-        headers: {
-          'X-RapidAPI-Key': config.wordsApiKey,
-          'X-RapidAPI-Host': 'wordsapiv1.p.rapidapi.com'
-        }
-      });
-
-      return {
-        word: word,
-        synonyms: response.data.synonyms || []
-      };
-    } catch (error) {
-      console.log('WordsAPI failed, using fallback:', error.message);
-      // Fallback to free API that might have some synonyms
-      return this.getSynonymsFallback(word);
-    }
-  }
-
-  // Fallback method for getting synonyms from free API
-  async getSynonymsFallback(word) {
-    try {
-      const response = await axios.get(`${this.baseURL}${word}`);
+      const response = await axios.get(`${this.baseURL}${word.toLowerCase()}`);
       const data = response.data[0];
       const synonyms = [];
 
@@ -98,45 +80,18 @@ class DictionaryAPI {
         word: word,
         synonyms: uniqueSynonyms
       };
-    } catch (fallbackError) {
-      if (fallbackError.response && fallbackError.response.status === 404) {
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
         throw new Error(`The word "${word}" was not found. Please check the spelling and try again.`);
       }
       throw new Error(`Could not find synonyms for "${word}". Please try a different word.`);
     }
   }
 
-  // Get antonyms using WordsAPI (requires API key)
+  // Get antonyms from free API
   async getAntonyms(word) {
     try {
-      if (!config.wordsApiKey) {
-        console.log('WordsAPI key not configured, using fallback method');
-        // Use fallback immediately if no API key
-        return this.getAntonymsFallback(word);
-      }
-
-      const response = await axios.get(`${this.wordsApiURL}${word}/antonyms`, {
-        headers: {
-          'X-RapidAPI-Key': config.wordsApiKey,
-          'X-RapidAPI-Host': 'wordsapiv1.p.rapidapi.com'
-        }
-      });
-
-      return {
-        word: word,
-        antonyms: response.data.antonyms || []
-      };
-    } catch (error) {
-      console.log('WordsAPI failed, using fallback:', error.message);
-      // Fallback to free API that might have some antonyms
-      return this.getAntonymsFallback(word);
-    }
-  }
-
-  // Fallback method for getting antonyms from free API
-  async getAntonymsFallback(word) {
-    try {
-      const response = await axios.get(`${this.baseURL}${word}`);
+      const response = await axios.get(`${this.baseURL}${word.toLowerCase()}`);
       const data = response.data[0];
       const antonyms = [];
 
@@ -165,8 +120,8 @@ class DictionaryAPI {
         word: word,
         antonyms: uniqueAntonyms
       };
-    } catch (fallbackError) {
-      if (fallbackError.response && fallbackError.response.status === 404) {
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
         throw new Error(`The word "${word}" was not found. Please check the spelling and try again.`);
       }
       throw new Error(`Could not find antonyms for "${word}". Please try a different word.`);
@@ -176,7 +131,7 @@ class DictionaryAPI {
   // Get complete word information
   async getWordInfo(word) {
     try {
-      const response = await axios.get(`${this.baseURL}${word}`);
+      const response = await axios.get(`${this.baseURL}${word.toLowerCase()}`);
       const data = response.data[0];
 
       if (!data) {
@@ -222,6 +177,9 @@ class DictionaryAPI {
         sourceUrls: data.sourceUrls || []
       };
     } catch (error) {
+      if (error.response && error.response.status === 404) {
+        throw new Error(`The word "${word}" was not found. Please check the spelling and try again.`);
+      }
       throw new Error(`Could not find information for "${word}"`);
     }
   }

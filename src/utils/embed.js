@@ -40,20 +40,29 @@ class EmbedHelper {
       // Create a numbered list of definitions for this part of speech
       let fieldValue = '';
       definitions.forEach((def, index) => {
-        fieldValue += `**${index + 1}.** ${def.definition}`;
-        if (def.example) {
-          fieldValue += `\n💭 *"${def.example}"*`;
+        const definitionText = `**${index + 1}.** ${def.definition}`;
+        const exampleText = def.example ? `\n💭 *"${def.example}"*` : '';
+        const newContent = definitionText + exampleText;
+
+        // Check if adding this definition would exceed Discord's field limit (1024 chars)
+        if (fieldValue.length + newContent.length + 2 > 1024) {
+          return; // Skip this definition if it would exceed limit
         }
-        if (index < definitions.length - 1) {
+
+        fieldValue += newContent;
+        if (index < definitions.length - 1 && fieldValue.length < 950) { // Leave room for spacing
           fieldValue += '\n\n';
         }
       });
 
-      embed.addFields({
-        name: `${emoji} ${partOfSpeechLabel}`,
-        value: fieldValue,
-        inline: false
-      });
+      // Only add field if there's content
+      if (fieldValue.trim()) {
+        embed.addFields({
+          name: `${emoji} ${partOfSpeechLabel}`,
+          value: fieldValue,
+          inline: false
+        });
+      }
     });
 
     // Add synonyms if available
