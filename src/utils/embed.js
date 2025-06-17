@@ -166,28 +166,23 @@ class EmbedHelper {
       .setDescription('🌟 **Welcome!** Here are all the slash commands you can use:')
       .addFields(
         {
-          name: '📖 `/define <word>`',
-          value: '> Get a comprehensive definition of any word\n> *Example: `/define magnificent`*',
+          name: '📖 Dictionary Commands',
+          value: '• `/define <word>` - Get a comprehensive definition\n• `/synonyms <word>` - Find similar words\n• `/antonyms <word>` - Find opposite words\n• `/word <word>` - Get complete word info',
           inline: false
         },
         {
-          name: '🔗 `/synonyms <word>`',
-          value: '> Find words with similar meanings\n> *Example: `/synonyms happy`*',
+          name: '🔤 Word Chain Game Commands',
+          value: '• `/start-wordchain` - Start a new word chain game\n• `/join-game` - Join the current game\n• `/leave-game` - Leave the game (before it starts)\n• `/game-status` - Check current game status\n• `/word <word>` - Submit a word during the game',
           inline: false
         },
         {
-          name: '🔀 `/antonyms <word>`',
-          value: '> Discover words with opposite meanings\n> *Example: `/antonyms good`*',
+          name: '🎮 How to Play Word Chain',
+          value: '1️⃣ Someone starts a game with `/start-wordchain`\n2️⃣ Players join with `/join-game` (20 seconds to join)\n3️⃣ Make words starting with the last letter of previous word\n4️⃣ Each letter has points (Z=10, Q=10, A=1, etc.)\n5️⃣ Game lasts 2 minutes, highest score wins!',
           inline: false
         },
         {
-          name: '📋 `/word <word>`',
-          value: '> Get complete information about a word\n> *Example: `/word fantastic`*',
-          inline: false
-        },
-        {
-          name: '❓ `/help`',
-          value: '> Show this help guide\n> *You\'re looking at it right now!*',
+          name: '❓ Other Commands',
+          value: '• `/help` - Show this help guide',
           inline: false
         }
       )

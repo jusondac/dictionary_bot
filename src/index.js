@@ -23,18 +23,18 @@ for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
   const command = require(filePath);
 
-  if ('name' in command && 'execute' in command) {
-    client.commands.set(command.name, command);
-    console.log(`✅ Loaded command: ${command.name}`);
-  } else {
-    console.log(`⚠️  The command at ${filePath} is missing a required "name" or "execute" property.`);
-  }
+  // if ('name' in command && 'execute' in command) {
+  //   client.commands.set(command.name, command);
+  //   console.log(`✅ Loaded command: ${command.name}`);
+  // } else {
+  //   console.log(`⚠️  The command at ${filePath} is missing a required "name" or "execute" property.`);
+  // }
 }
 
 // When the client is ready, run this code
 client.once('ready', () => {
-  console.log(`🚀 ${client.user.tag} is online and ready!`);
-  console.log(`📚 Dictionary bot is serving ${client.guilds.cache.size} servers`);
+  // console.log(`🚀 ${client.user.tag} is online and ready!`);
+  // console.log(`📚 Dictionary bot is serving ${client.guilds.cache.size} servers`);
 
   // Set bot activity
   client.user.setActivity('/help for commands', { type: 'WATCHING' });
@@ -54,9 +54,15 @@ client.on('interactionCreate', async interaction => {
   try {
     // Convert interaction to message-like object for compatibility
     const args = [];
-    if (interaction.options.getString('word')) {
-      args.push(interaction.options.getString('word'));
+
+    // Handle different option types for different commands
+    const wordOption = interaction.options.getString('word');
+    if (wordOption) {
+      args.push(wordOption);
     }
+
+    // Debug logging
+    // console.log(`🔍 Command: ${interaction.commandName}, Channel ID: ${interaction.channel?.id}, Guild: ${interaction.guild?.name}`);
 
     // Create a mock message object for compatibility with existing commands
     const mockMessage = {
@@ -67,18 +73,32 @@ client.on('interactionCreate', async interaction => {
         return await interaction.reply(options);
       },
       channel: {
+        id: interaction.channel?.id,
+        send: async (options) => {
+          if (interaction.channel) {
+            return await interaction.channel.send(options);
+          } else {
+            throw new Error('Channel not available');
+          }
+        },
         sendTyping: async () => {
           if (!interaction.deferred) {
             await interaction.deferReply();
           }
         }
       },
-      author: interaction.user,
-      guild: interaction.guild
+      author: {
+        id: interaction.user.id,
+        username: interaction.user.username,
+        displayName: interaction.user.displayName || interaction.user.username,
+        tag: interaction.user.tag
+      },
+      guild: interaction.guild,
+      options: interaction.options // Add the options for slash command compatibility
     };
 
     await command.execute(mockMessage, args);
-    console.log(`📝 ${interaction.user.tag} used slash command: /${interaction.commandName}`);
+    // console.log(`📝 ${interaction.user.tag} used slash command: /${interaction.commandName}`);
   } catch (error) {
     console.error(`❌ Error executing slash command ${interaction.commandName}:`, error);
 
@@ -96,6 +116,33 @@ client.on('interactionCreate', async interaction => {
 client.on('messageCreate', async (message) => {
   // Ignore messages from bots
   if (message.author.bot) return;
+
+  // First, check if there's an active word chain game and this could be a word submission
+  const { games } = require('./utils/wordchain');
+  const game = games.get(message.channel?.id);
+
+  if (game && game.gameState === 'playing' && !message.content.startsWith(config.prefix)) {
+    // This might be a word submission for the word chain game
+    const word = message.content.trim();
+
+    // Only process if it looks like a single word (no spaces, only letters)
+    if (word && /^[a-zA-Z]+$/.test(word) && !word.includes(' ')) {
+      // console.log(`🎮 Potential word submission: "${word}" from ${message.author.tag}`);
+
+      // Import and use the word command logic
+      const wordCommand = client.commands.get('word');
+      if (wordCommand) {
+        try {
+          // Create args array with the word
+          const args = [word];
+          await wordCommand.execute(message, args);
+          return; // Don't process as a regular command
+        } catch (error) {
+          console.error('Error processing word chain submission:', error);
+        }
+      }
+    }
+  }
 
   // Check if message starts with prefix
   if (!message.content.startsWith(config.prefix)) return;
@@ -115,14 +162,13 @@ client.on('messageCreate', async (message) => {
   try {
     // Execute the command
     await command.execute(message, args);
-    console.log(`📝 ${message.author.tag} used command: ${commandName} in ${message.guild?.name || 'DM'}`);
+    // console.log(`📝 ${message.author.tag} used command: ${commandName} in ${message.guild?.name || 'DM'}`);
   } catch (error) {
     console.error(`❌ Error executing command ${commandName}:`, error);
 
     try {
       await message.reply({
-        content: '❌ There was an error executing this command!',
-        ephemeral: true
+        content: '❌ There was an error executing this command!'
       });
     } catch (replyError) {
       console.error('❌ Could not send error message:', replyError);
