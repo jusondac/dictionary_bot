@@ -79,7 +79,7 @@ class DictionaryAPI {
         if (meaning.synonyms && meaning.synonyms.length > 0) {
           synonyms.push(...meaning.synonyms);
         }
-        
+
         // Get synonyms from individual definitions
         meaning.definitions.forEach(def => {
           if (def.synonyms && def.synonyms.length > 0) {
@@ -89,7 +89,7 @@ class DictionaryAPI {
       });
 
       const uniqueSynonyms = [...new Set(synonyms)]; // Remove duplicates
-      
+
       if (uniqueSynonyms.length === 0) {
         throw new Error(`No synonyms found for "${word}". Try a different word or check the spelling.`);
       }
@@ -146,7 +146,7 @@ class DictionaryAPI {
         if (meaning.antonyms && meaning.antonyms.length > 0) {
           antonyms.push(...meaning.antonyms);
         }
-        
+
         // Get antonyms from individual definitions
         meaning.definitions.forEach(def => {
           if (def.antonyms && def.antonyms.length > 0) {
@@ -156,7 +156,7 @@ class DictionaryAPI {
       });
 
       const uniqueAntonyms = [...new Set(antonyms)]; // Remove duplicates
-      
+
       if (uniqueAntonyms.length === 0) {
         throw new Error(`No antonyms found for "${word}". Try a different word or check the spelling.`);
       }

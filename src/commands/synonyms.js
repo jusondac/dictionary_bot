@@ -15,7 +15,7 @@ module.exports = {
   async execute(message, args) {
     // Handle both slash commands and regular messages
     let word;
-    
+
     if (args && args.length > 0) {
       // Regular message command
       word = args.join(' ').toLowerCase();
