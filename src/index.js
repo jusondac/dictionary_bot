@@ -23,12 +23,12 @@ for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
   const command = require(filePath);
 
-  // if ('name' in command && 'execute' in command) {
-  //   client.commands.set(command.name, command);
-  //   console.log(`✅ Loaded command: ${command.name}`);
-  // } else {
-  //   console.log(`⚠️  The command at ${filePath} is missing a required "name" or "execute" property.`);
-  // }
+  if ('name' in command && 'execute' in command) {
+    client.commands.set(command.name, command);
+    console.log(`✅ Loaded command: ${command.name}`);
+  } else {
+    console.log(`⚠️  The command at ${filePath} is missing a required "name" or "execute" property.`);
+  }
 }
 
 // When the client is ready, run this code

@@ -108,7 +108,7 @@ function startTurnTimer(game, channel) {
     clearTimeout(game.turnTimeout);
   }
 
-  // Set 20-second turn timeout
+  // Set 40-second turn timeout
   game.turnTimeout = setTimeout(async () => {
     if (game.gameState === 'playing') {
       const currentPlayer = game.getCurrentPlayer();
@@ -140,7 +140,7 @@ function startTurnTimer(game, channel) {
         startTurnTimer(game, channel);
       }
     }
-  }, 20000);
+  }, 40000);
 }
 
 // Export the helper function for use in other commands

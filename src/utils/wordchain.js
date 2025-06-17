@@ -84,7 +84,7 @@ class WordChainGame {
     this.currentPlayerIndex = 0;
     this.turnStartTime = Date.now();
 
-    // Set game timeout (2 minutes)
+    // Set game timeout (5 minutes)
     this.gameTimeout = setTimeout(() => {
       if (this.gameState === 'playing') {
         this.endGame();
@@ -92,7 +92,7 @@ class WordChainGame {
           endCallback();
         }
       }
-    }, 2 * 60 * 1000);
+    }, 5 * 60 * 1000);
 
     return true;
   }
