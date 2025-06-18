@@ -40,7 +40,7 @@ module.exports = {
 
     if (game && game.gameState === 'playing') {
       // This is a word chain game submission
-      const result = game.submitWord(word, userId);
+      const result = await game.submitWord(word, userId);
       // console.log(`🎯 Word submission result:`, result);
 
       if (result.success) {

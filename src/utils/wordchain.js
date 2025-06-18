@@ -12,7 +12,17 @@ const LETTER_POINTS = {
 const STARTING_WORDS = [
   'apple', 'elephant', 'tiger', 'rabbit', 'orange', 'unicorn', 'dragon', 'phoenix',
   'butterfly', 'mountain', 'ocean', 'forest', 'castle', 'garden', 'rainbow', 'thunder',
-  'whisper', 'crystal', 'mystery', 'adventure', 'treasure', 'journey', 'sunset', 'melody'
+  'whisper', 'crystal', 'mystery', 'adventure', 'treasure', 'journey', 'sunset', 'melody',
+  'banana', 'giraffe', 'zebra', 'kangaroo', 'dolphin', 'penguin', 'volcano', 'island',
+  'desert', 'river', 'cloud', 'shadow', 'ember', 'flame', 'galaxy', 'nebula', 'comet',
+  'meteor', 'planet', 'asteroid', 'star', 'moon', 'eclipse', 'harbor', 'lagoon', 'reef',
+  'prairie', 'savanna', 'jungle', 'canyon', 'valley', 'peak', 'summit', 'cliff', 'cave',
+  'tornado', 'cyclone', 'blizzard', 'avalanche', 'storm', 'breeze', 'gust', 'zephyr',
+  'echo', 'horizon', 'mirage', 'miracle', 'legend', 'fable', 'myth', 'oracle', 'prophecy',
+  'saga', 'quest', 'odyssey', 'voyage', 'expedition', 'mission', 'explorer', 'pioneer',
+  'inventor', 'genius', 'wizard', 'sorcerer', 'witch', 'fairy', 'gnome', 'elf', 'dwarf',
+  'giant', 'ogre', 'troll', 'sprite', 'nymph', 'mermaid', 'kraken', 'leviathan', 'griffin',
+  'hydra', 'basilisk', 'chimera', 'minotaur', 'sphinx', 'pegasus', 'centaur', 'satyr'
 ];
 
 class WordChainGame {
@@ -96,8 +106,8 @@ class WordChainGame {
     }, 5 * 60 * 1000);
 
     return true;
-  } 
-  
+  }
+
   async isValidWord(word, userId) {
     const normalizedWord = word.toLowerCase().trim();
 
@@ -224,22 +234,7 @@ class WordChainGame {
       const turnTimeRemaining = Math.max(0, 20 - turnTimeElapsed);
 
       embed.setTitle('🔤 Word Chain Game - In Progress')
-        .setDescription(`**# Current Word: \`${this.currentWord.toUpperCase()}\`**\n**Next word must start with: \`${this.currentWord.slice(-1).toUpperCase()}\`**`)
-        .addFields(
-          {
-            name: '🎯 Current Turn',
-            value: currentPlayer ? `${currentPlayer.username}` : 'Unknown',
-            inline: true
-          },
-          {
-            name: '📊 Scores',
-            value: this.getPlayersList()
-              .sort((a, b) => b.score - a.score)
-              .map(p => `${p.username}: ${p.score} pts`)
-              .join('\n') || 'No scores yet',
-            inline: false
-          }
-        );
+        .setDescription(`**# \`${this.currentWord.toUpperCase()}\`**\n**Next word must start with: \`${this.currentWord.slice(-1).toUpperCase()}\`**`)
     } else if (this.gameState === 'ended') {
       const winners = this.getPlayersList().sort((a, b) => b.score - a.score);
 
@@ -254,10 +249,13 @@ class WordChainGame {
           inline: false
         });
 
-      if (winners.length > 0 && winners[0].words.length > 0) {
+      // Show all words used in the game
+      const allWordsUsed = Array.from(this.usedWords);
+      if (allWordsUsed.length > 0) {
+        const wordsToShow = allWordsUsed.slice(0, 20); // Show up to 20 words
         embed.addFields({
-          name: '📝 Words Used',
-          value: winners[0].words.slice(0, 10).join(', ') + (winners[0].words.length > 10 ? '...' : ''),
+          name: '📝 Words Used in Game',
+          value: wordsToShow.join(', ') + (allWordsUsed.length > 20 ? `... (${allWordsUsed.length} total)` : ''),
           inline: false
         });
       }
@@ -267,6 +265,7 @@ class WordChainGame {
   }
 
   getQueueEmbed() {
+    const currentPlayer = this.getCurrentPlayer();
     const embed = new EmbedBuilder()
       .setColor(0x00ff00)
       .setTitle('📋 Turn Queue')
@@ -275,11 +274,22 @@ class WordChainGame {
     if (this.gameState === 'playing') {
       const playersList = this.getPlayersList();
       const queueText = playersList.map((p, i) => {
-        const indicator = i === this.currentPlayerIndex ? '▶️' : '⏸️';
+        const indicator = i === this.currentPlayerIndex ? '▶️' : '- ';
         return `${indicator} ${p.username} (${p.score} pts)`;
       }).join('\n');
-
-      embed.setDescription(queueText || 'No players in queue');
+      embed.addFields({
+        name: '🔄 Current Player',
+        value: currentPlayer ? `<@${currentPlayer.userId}>` : 'Unknown',
+        inline: true
+      }, {
+        name: '📊 Scores',
+        value: this.getPlayersList()
+          .sort((a, b) => b.score - a.score)
+          .map(p => `<@${p.userId}>: ${p.score} pts`)
+          .join('\n') || 'No scores yet',
+        inline: false
+      }
+      );
     } else {
       embed.setDescription('Game is not currently active');
     }

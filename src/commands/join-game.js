@@ -45,8 +45,7 @@ module.exports = {
     if (success) {
       const embed = game.getGameEmbed();
       await message.reply({
-        content: `✅ **${username}** joined the game! (${game.players.size} players)`,
-        embeds: [embed]
+        content: `✅ **${username}** joined the game! (${game.players.size} players)`
       });
 
       // Auto-start if we have enough players and some time has passed
